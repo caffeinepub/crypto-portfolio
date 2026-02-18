@@ -1,0 +1,145 @@
+{
+  "kind": "build_request",
+  "title": "Crypto Portfolio App with Internet Identity, Manual Holdings, Live Prices, and Performance",
+  "projectName": "Crypto Portfolio",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Implement user authentication using Internet Identity and require users to be signed in before they can view or modify any portfolio data.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ],
+        "quotes": [
+          "User must autenticate with Internet identity"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users see a sign-in prompt and cannot access portfolio screens.",
+        "Authenticated users remain signed in across refreshes until they sign out.",
+        "A visible sign-out control is available when signed in."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Allow authenticated users to create, view, edit, and delete their crypto holdings, where holdings are user-entered (no exchange sync). Each holding must include at minimum: asset identifier (symbol and/or coin id), quantity, and an optional cost basis (total cost or average buy price) to enable gains/loss calculations.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ],
+        "quotes": [
+          "1 only users entered Holding with live coin price."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can add a new holding and it persists to the backend under their identity.",
+        "Users can edit quantity and cost basis fields and see updates reflected after reload.",
+        "Users can delete a holding and it no longer appears after reload.",
+        "Holdings are isolated per authenticated user (one user cannot see another user’s holdings)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Fetch live coin prices from an external public price API and use them to compute each holding’s current value and the total portfolio value.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ],
+        "quotes": [
+          "1 only users entered Holding with live coin price."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each holding shows a live price and current value (quantity × live price).",
+        "The portfolio shows a total current value across all holdings.",
+        "If the price API is unavailable, the UI shows a clear English error state and retains the last successfully fetched prices in the UI for the current session (if available)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Display portfolio performance for authenticated users including per-asset and total gains/losses (both absolute and percentage) using current values and user-entered cost basis.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ],
+        "quotes": [
+          "2. With portfolio performance like gains,losses wit current values"
+        ]
+      },
+      "acceptanceCriteria": [
+        "For holdings with cost basis provided, the UI shows gain/loss amount and gain/loss percentage.",
+        "The UI shows total gain/loss amount and total gain/loss percentage across all holdings with cost basis.",
+        "Holdings without cost basis are clearly indicated and excluded from gain/loss calculations (but still included in current total value)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add at least one simple performance visualization (e.g., allocation by asset and/or gains vs. losses summary) suitable for the available data (manual holdings + live prices + cost basis).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ],
+        "quotes": [
+          "With portfolio performance like gains,losses wit current values"
+        ]
+      },
+      "acceptanceCriteria": [
+        "At least one chart/visual summary renders correctly on desktop and mobile sizes.",
+        "The visualization updates when holdings are added/edited/deleted or when prices refresh."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Create and apply a cohesive visual theme for the app (colors, typography, spacing, component styling) and use it consistently across authentication, holdings, and performance screens. Do not use a blue/purple primary palette.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All key screens share a consistent styling system (buttons, cards, tables/forms, headings).",
+        "The primary palette is not blue/purple.",
+        "UI is responsive and readable on mobile and desktop."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add generated static image assets required by the UI (logo and a subtle background/hero graphic) and render them from the frontend as static files (do not serve images from the backend).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-portfolio-req"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Generated images exist under frontend/public/assets/generated and are referenced by the UI.",
+        "Images load correctly in the running app without backend endpoints."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (no additional backend services).",
+    "Do not modify files under frontend/src/components/ui or other immutable paths listed in SYSTEM_CONTEXT; compose them instead.",
+    "Use English for all user-facing UI text."
+  ],
+  "nonGoals": [
+    "Exchange account linking or automatic import of holdings from centralized exchanges.",
+    "On-chain wallet integrations or Web3 wallet connections.",
+    "Real-time streaming prices via websockets; periodic polling is sufficient.",
+    "Tax reporting features."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Minimal geometric coin/portfolio logo mark, flat vector style (portfolio-logo.dim_512x512.png)",
+      "Subtle abstract background/hero graphic with warm-neutral palette, soft gradients, no text (portfolio-hero-bg.dim_1600x900.png)"
+    ],
+    "edits": []
+  }
+}

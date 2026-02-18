@@ -1,0 +1,156 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-user-authentication-using-internet-identity-and-require-users-to-be-signed-in-before-they-can-view-or-modify-any-portfolio-data",
+      "featureTitle": "Implement user authentication using Internet Identity and require users to be signed in before they can view or modify any portfolio data.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AuthGate.tsx",
+        "frontend/src/components/auth/UserProfileSetupDialog.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-allow-authenticated-users-to-create-view-edit-and-delete-their-crypto-holdings-where-holdings-are-user-entered-no-exchange-sync-each-holding-must-include-at-minimum-asset-identifier-symbol-and-or-coin-id-quantity-and-an-optional-cost-basis-total-cost-or-average-buy-price-to-enable-gains-loss-calculations",
+      "featureTitle": "Allow authenticated users to create, view, edit, and delete their crypto holdings, where holdings are user-entered (no exchange sync). Each holding must include at minimum: asset identifier (symbol and/or coin id), quantity, and an optional cost basis (total cost or average buy price) to enable gains/loss calculations.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/holdings/HoldingRowActions.tsx",
+        "frontend/src/components/holdings/HoldingUpsertDialog.tsx",
+        "frontend/src/components/holdings/HoldingsPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fetch-live-coin-prices-from-an-external-public-price-api-and-use-them-to-compute-each-holding-s-current-value-and-the-total-portfolio-value",
+      "featureTitle": "Fetch live coin prices from an external public price API and use them to compute each holding’s current value and the total portfolio value.",
+      "files": [
+        "frontend/src/components/holdings/HoldingsPanel.tsx",
+        "frontend/src/components/portfolio/PortfolioSummaryCards.tsx",
+        "frontend/src/hooks/useLivePrices.ts",
+        "frontend/src/services/prices/priceApi.ts",
+        "frontend/src/utils/portfolioMath.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-display-portfolio-performance-for-authenticated-users-including-per-asset-and-total-gains-losses-both-absolute-and-percentage-using-current-values-and-user-entered-cost-basis",
+      "featureTitle": "Display portfolio performance for authenticated users including per-asset and total gains/losses (both absolute and percentage) using current values and user-entered cost basis.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/holdings/HoldingsPanel.tsx",
+        "frontend/src/components/performance/PerformancePanel.tsx",
+        "frontend/src/utils/performanceMath.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-at-least-one-simple-performance-visualization-e-g-allocation-by-asset-and-or-gains-vs-losses-summary-suitable-for-the-available-data-manual-holdings-live-prices-cost-basis",
+      "featureTitle": "Add at least one simple performance visualization (e.g., allocation by asset and/or gains vs. losses summary) suitable for the available data (manual holdings + live prices + cost basis).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/charts/AllocationDonutChart.tsx",
+        "frontend/src/components/performance/PerformanceVisualizationPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-and-apply-a-cohesive-visual-theme-for-the-app-colors-typography-spacing-component-styling-and-use-it-consistently-across-authentication-holdings-and-performance-screens-do-not-use-a-blue-purple-primary-palette",
+      "featureTitle": "Create and apply a cohesive visual theme for the app (colors, typography, spacing, component styling) and use it consistently across authentication, holdings, and performance screens. Do not use a blue/purple primary palette.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-generated-static-image-assets-required-by-the-ui-logo-and-a-subtle-background-hero-graphic-and-render-them-from-the-frontend-as-static-files-do-not-serve-images-from-the-backend",
+      "featureTitle": "Add generated static image assets required by the UI (logo and a subtle background/hero graphic) and render them from the frontend as static files (do not serve images from the backend).",
+      "files": [
+        "frontend/src/components/auth/AuthGate.tsx",
+        "frontend/src/components/layout/AppLayout.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

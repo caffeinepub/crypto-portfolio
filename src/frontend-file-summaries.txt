@@ -1,0 +1,19 @@
+{
+  "frontend/src/App.tsx": "Main application component that handles authentication flow, user profile setup, and renders the authenticated portfolio dashboard with summary cards, holdings, performance panels, and visualization.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profile management (get/save), user role fetching, and holdings CRUD operations (get/add/update/delete) with proper error handling and cache invalidation.",
+  "frontend/src/hooks/useLivePrices.ts": "Custom hook that fetches live cryptocurrency prices from CoinGecko API with 60-second polling, maintains last successful prices in memory for resilient error handling, and provides loading/error states.",
+  "frontend/src/services/prices/priceApi.ts": "Price API client that fetches spot prices from CoinGecko's public API, maps common crypto symbols to CoinGecko IDs, and handles batch price requests with proper error handling.",
+  "frontend/src/utils/portfolioMath.ts": "Utility functions for portfolio calculations including current value computation, total portfolio value aggregation, and number/currency/percentage formatting helpers.",
+  "frontend/src/utils/performanceMath.ts": "Performance calculation utilities that compute per-holding and total portfolio gains/losses (absolute and percentage) while properly handling holdings with and without cost basis.",
+  "frontend/src/components/layout/AppLayout.tsx": "Main layout component with sticky header containing logo/branding, theme toggle, sign-out button, subtle background image, and footer with attribution link.",
+  "frontend/src/components/auth/AuthGate.tsx": "Authentication gate component that displays a welcome screen with feature highlights and Internet Identity sign-in button for unauthenticated users.",
+  "frontend/src/components/auth/UserProfileSetupDialog.tsx": "Modal dialog that prompts first-time users to enter their name after authentication, preventing dismissal until profile is saved.",
+  "frontend/src/components/portfolio/PortfolioSummaryCards.tsx": "Dashboard summary cards displaying total portfolio value, total gain/loss with color-coded indicators, and cost basis information with loading states and price error handling.",
+  "frontend/src/components/holdings/HoldingsPanel.tsx": "Main holdings management panel with table view of all holdings showing asset, quantity, live price, current value, and cost basis with add/edit/delete actions.",
+  "frontend/src/components/holdings/HoldingUpsertDialog.tsx": "Modal dialog form for adding new holdings or editing existing ones with fields for asset symbol, quantity, and optional cost basis.",
+  "frontend/src/components/holdings/HoldingRowActions.tsx": "Dropdown menu component for per-holding actions (edit/delete) with confirmation dialog for delete operations.",
+  "frontend/src/components/performance/PerformancePanel.tsx": "Performance details table showing per-asset breakdown of cost basis, current value, gain/loss amounts and percentages with color-coded indicators for positive/negative performance.",
+  "frontend/src/components/performance/PerformanceVisualizationPanel.tsx": "Sticky sidebar panel displaying portfolio allocation donut chart with legend showing percentage distribution by asset.",
+  "frontend/src/components/charts/AllocationDonutChart.tsx": "Custom SVG donut chart component that visualizes portfolio allocation by current value using theme colors without external chart libraries.",
+  "frontend/src/index.css": "Global styles with OKLCH color system using warm green primary palette (avoiding blue/purple), supporting both light and dark modes with proper contrast ratios."
+}

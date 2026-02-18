@@ -1,0 +1,233 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Crypto Portfolio Frontend (II auth, manual holdings, live prices, performance)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Gate the app behind Internet Identity login, support logout, and prompt for first-time user profile name setup.",
+      "acceptanceCriteria": [
+        "Unauthenticated users see a sign-in prompt and cannot access portfolio screens.",
+        "Authenticated users remain signed in across refreshes until they sign out.",
+        "A visible sign-out control is available when signed in."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Create the root app shell that uses the selected component \"authorization\" (frontend capability: Internet Identity auth + access control UX patterns) to gate all portfolio UI behind authentication, show a sign-in prompt when logged out, and provide a sign-out control when logged in. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/AuthGate.tsx",
+          "operation": "create",
+          "description": "Add an AuthGate wrapper using useInternetIdentity to block access to authenticated screens and render a sign-in prompt with login/logout controls using the selected component \"authorization\" guidance. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/UserProfileSetupDialog.tsx",
+          "operation": "create",
+          "description": "Create a first-login profile setup dialog that calls backend getCallerUserProfile/saveCallerUserProfile and avoids modal flash per the selected component \"authorization\" guidance. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useCurrentUserProfile.ts",
+          "operation": "create",
+          "description": "Add a React Query hook to fetch current user profile via actor.getCallerUserProfile with proper enabled/isFetched handling (per selected component \"authorization\" guidance). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useCurrentUserRole.ts",
+          "operation": "create",
+          "description": "Add a React Query hook that fetches the caller role (actor.getCallerUserRole) and exposes an easy-to-consume state for access-denied messaging (guests vs users)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Provide authenticated CRUD UI for manual holdings (asset, quantity, optional cost basis) backed by canister calls and scoped to the current user.",
+      "acceptanceCriteria": [
+        "Users can add a new holding and it persists to the backend under their identity.",
+        "Users can edit quantity and cost basis fields and see updates reflected after reload.",
+        "Users can delete a holding and it no longer appears after reload.",
+        "Holdings are isolated per authenticated user (one user cannot see another user’s holdings)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useHoldings.ts",
+          "operation": "create",
+          "description": "Create React Query hooks (query + mutations) for getHoldings/addHolding/updateHolding/deleteHolding and handle canister authorization failures with clear English messages."
+        },
+        {
+          "path": "frontend/src/components/holdings/HoldingsPanel.tsx",
+          "operation": "create",
+          "description": "Add a holdings panel that lists holdings and provides add/edit/delete actions; compose shadcn-ui components (e.g., Card, Button, Table, Dialog, Input) for consistent UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/holdings/HoldingUpsertDialog.tsx",
+          "operation": "create",
+          "description": "Create an add/edit dialog for holdings with fields: asset, quantity, optional cost basis; validate required inputs and call the appropriate mutation; compose shadcn-ui form primitives. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/holdings/HoldingRowActions.tsx",
+          "operation": "create",
+          "description": "Create per-row edit/delete controls with a delete confirmation UI; compose shadcn-ui components for buttons/dialogs. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the HoldingsPanel into the authenticated area so it is reachable (not an orphan) and ensure it refetches after mutations via shared query invalidation."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Fetch live prices from a public API with polling, compute holding/portfolio current values, and show resilient error states that retain last session prices.",
+      "acceptanceCriteria": [
+        "Each holding shows a live price and current value (quantity × live price).",
+        "The portfolio shows a total current value across all holdings.",
+        "If the price API is unavailable, the UI shows a clear English error state and retains the last successfully fetched prices in the UI for the current session (if available)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/services/prices/priceApi.ts",
+          "operation": "create",
+          "description": "Implement a small client to fetch spot prices from a public price API (no secrets), supporting batching by asset symbol/id and returning normalized numbers."
+        },
+        {
+          "path": "frontend/src/hooks/useLivePrices.ts",
+          "operation": "create",
+          "description": "Create a hook that polls for live prices on an interval, caches the last successful prices in memory for the session, and exposes an English error state without clearing the last known good data."
+        },
+        {
+          "path": "frontend/src/utils/portfolioMath.ts",
+          "operation": "create",
+          "description": "Add shared utilities to compute current value per holding and total portfolio value from holdings + live prices."
+        },
+        {
+          "path": "frontend/src/components/portfolio/PortfolioSummaryCards.tsx",
+          "operation": "create",
+          "description": "Create summary cards showing total current value and basic price refresh status; compose shadcn-ui Card/Alert components for presentation. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/holdings/HoldingsPanel.tsx",
+          "operation": "modify",
+          "description": "Enhance holdings list to display live price and current value columns using useLivePrices, and show a non-blocking error banner when price fetch fails while keeping last successful values visible."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Compute and display per-asset and total gains/losses (absolute and %) using live prices and user-entered cost basis, excluding holdings without cost basis from gain/loss math.",
+      "acceptanceCriteria": [
+        "For holdings with cost basis provided, the UI shows gain/loss amount and gain/loss percentage.",
+        "The UI shows total gain/loss amount and total gain/loss percentage across all holdings with cost basis.",
+        "Holdings without cost basis are clearly indicated and excluded from gain/loss calculations (but still included in current total value)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/performanceMath.ts",
+          "operation": "create",
+          "description": "Add pure functions to compute per-holding gains/losses and aggregated totals while excluding holdings missing cost basis from performance totals (but not from current value totals)."
+        },
+        {
+          "path": "frontend/src/components/performance/PerformancePanel.tsx",
+          "operation": "create",
+          "description": "Create a performance panel that shows per-asset gain/loss ($ and %) and total gain/loss summaries; clearly indicate holdings with missing cost basis; compose shadcn-ui Table/Badge/Alert components. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/holdings/HoldingsPanel.tsx",
+          "operation": "modify",
+          "description": "Add cost basis presence indicators in the holdings list and ensure editing cost basis immediately updates performance views via shared state/query invalidation."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire PerformancePanel into the authenticated area alongside holdings and summary so users can access performance without navigating to an unregistered route."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add a responsive performance visualization that updates with holdings and live price refreshes.",
+      "acceptanceCriteria": [
+        "At least one chart/visual summary renders correctly on desktop and mobile sizes.",
+        "The visualization updates when holdings are added/edited/deleted or when prices refresh."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/charts/AllocationDonutChart.tsx",
+          "operation": "create",
+          "description": "Implement a lightweight responsive SVG donut chart for allocation by current value (no extra chart library) driven by holdings + live prices and using theme colors."
+        },
+        {
+          "path": "frontend/src/components/performance/PerformanceVisualizationPanel.tsx",
+          "operation": "create",
+          "description": "Create a small visualization section that uses AllocationDonutChart and an accompanying legend/summary, composed with shadcn-ui Card components. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the visualization panel into the authenticated portfolio screen and ensure it receives the same holdings/prices data so it updates on CRUD and price polling."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Apply a cohesive warm-neutral visual theme (non-blue/purple primary) with consistent responsive styling across auth, holdings, and performance UI.",
+      "acceptanceCriteria": [
+        "All key screens share a consistent styling system (buttons, cards, tables/forms, headings).",
+        "The primary palette is not blue/purple.",
+        "UI is responsive and readable on mobile and desktop."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Create global styles and Tailwind CSS variables for a cohesive warm-neutral theme with a non-blue/purple primary (e.g., warm green/amber) and consistent spacing/typography across the app."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Adjust theme tokens if needed to align with the warm-neutral palette (ensuring primary is not blue/purple) and support chart colors used by the visualization."
+        },
+        {
+          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "operation": "create",
+          "description": "Add a shared layout (header + main container) used by both the sign-in prompt and authenticated screens for consistent typography, spacing, and responsive structure; compose shadcn-ui primitives where appropriate. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Adopt AppLayout for both unauthenticated and authenticated states to ensure consistent theming and responsive behavior across all key screens."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add and render generated static logo and hero/background image assets from the frontend public folder.",
+      "acceptanceCriteria": [
+        "Generated images exist under frontend/public/assets/generated and are referenced by the UI.",
+        "Images load correctly in the running app without backend endpoints."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/portfolio-logo.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated logo asset as a static file at the required path for use in the header/auth screens."
+        },
+        {
+          "path": "frontend/public/assets/generated/portfolio-hero-bg.dim_1600x900.png",
+          "operation": "create",
+          "description": "Add the generated subtle hero/background graphic as a static file at the required path for use behind the main layout."
+        },
+        {
+          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Render the static images from frontend/public/assets/generated/portfolio-logo.dim_512x512.png (logo/brand mark) and frontend/public/assets/generated/portfolio-hero-bg.dim_1600x900.png (subtle background) within the layout in an accessible, responsive way."
+        },
+        {
+          "path": "frontend/src/components/auth/AuthGate.tsx",
+          "operation": "modify",
+          "description": "Reference the logo asset (frontend/public/assets/generated/portfolio-logo.dim_512x512.png) in the sign-in prompt area to reinforce branding consistency."
+        }
+      ]
+    }
+  ]
+}

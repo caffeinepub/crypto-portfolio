@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Crypto portfolio app where users authenticate with Internet Identity, manually enter holdings, and the app fetches live coin prices to show current values and portfolio performance (gains/losses).",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Minimal geometric coin/portfolio logo mark, flat vector style (portfolio-logo.dim_512x512.png)\n- Subtle abstract background/hero graphic with warm-neutral palette, soft gradients, no text (portfolio-hero-bg.dim_1600x900.png)",
+  "existing_features": [
+    {
+      "id": "feature-implement-user-authentication-using-internet-identity-and-require-users-to-be-signed-in-before-they-can-view-or-modify-any-portfolio-data",
+      "title": "Implement user authentication using Internet Identity and require users to be signed in before they can view or modify any portfolio data.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-allow-authenticated-users-to-create-view-edit-and-delete-their-crypto-holdings-where-holdings-are-user-entered-no-exchange-sync-each-holding-must-include-at-minimum-asset-identifier-symbol-and-or-coin-id-quantity-and-an-optional-cost-basis-total-cost-or-average-buy-price-to-enable-gains-loss-calculations",
+      "title": "Allow authenticated users to create, view, edit, and delete their crypto holdings, where holdings are user-entered (no exchange sync). Each holding must include at minimum: asset identifier (symbol and/or coin id), quantity, and an optional cost basis (total cost or average buy price) to enable gains/loss calculations.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fetch-live-coin-prices-from-an-external-public-price-api-and-use-them-to-compute-each-holding-s-current-value-and-the-total-portfolio-value",
+      "title": "Fetch live coin prices from an external public price API and use them to compute each holding’s current value and the total portfolio value.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-portfolio-performance-for-authenticated-users-including-per-asset-and-total-gains-losses-both-absolute-and-percentage-using-current-values-and-user-entered-cost-basis",
+      "title": "Display portfolio performance for authenticated users including per-asset and total gains/losses (both absolute and percentage) using current values and user-entered cost basis.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-at-least-one-simple-performance-visualization-e-g-allocation-by-asset-and-or-gains-vs-losses-summary-suitable-for-the-available-data-manual-holdings-live-prices-cost-basis",
+      "title": "Add at least one simple performance visualization (e.g., allocation by asset and/or gains vs. losses summary) suitable for the available data (manual holdings + live prices + cost basis).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-and-apply-a-cohesive-visual-theme-for-the-app-colors-typography-spacing-component-styling-and-use-it-consistently-across-authentication-holdings-and-performance-screens-do-not-use-a-blue-purple-primary-palette",
+      "title": "Create and apply a cohesive visual theme for the app (colors, typography, spacing, component styling) and use it consistently across authentication, holdings, and performance screens. Do not use a blue/purple primary palette.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-image-assets-required-by-the-ui-logo-and-a-subtle-background-hero-graphic-and-render-them-from-the-frontend-as-static-files-do-not-serve-images-from-the-backend",
+      "title": "Add generated static image assets required by the UI (logo and a subtle background/hero graphic) and render them from the frontend as static files (do not serve images from the backend).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Build crypto portfolio app (overall product)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Allow users to manually enter and manage crypto holdings (no exchange sync)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Fetch live coin prices from an external API to value holdings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Show portfolio performance (gains/losses) with current values, including charts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Require user authentication via Internet Identity",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Crypto Portfolio",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
