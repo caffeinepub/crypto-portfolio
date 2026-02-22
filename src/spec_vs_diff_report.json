@@ -1,84 +1,26 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T12:24:09.399Z",
-  "summary": "Most core portfolio functionality appears implemented: Internet Identity-gated UI, CRUD holdings with optional cost basis persisted per caller, live price polling with session-level last-known fallback, performance calculations, and an allocation visualization. However, the required generated static image assets cannot be verified from the provided diff (image files are omitted), and several unrequested features (user profiles, access-control secret initialization, theme toggle/footer) were added.",
+  "generatedAt": "2026-02-21T17:43:36.468Z",
+  "summary": "The implementation successfully addresses both REQ-1 and REQ-2. A backend function `getAllTransactions()` was added to return transaction data, and a frontend `TransactionHistoryPanel` component was created to display the transaction history below existing features. All required fields and acceptance criteria appear to be implemented based on the evidence in the diff.",
   "missing_requirements": [
     {
-      "id": "REQ-7",
-      "requirement": "Add generated static image assets (logo and hero background) under frontend/public/assets/generated and render them from the frontend as static files.",
-      "reason": "The UI references the required image paths, but the diff summary does not show the actual image files under frontend/public/assets/generated (some added files were omitted due to limits), so existence cannot be confirmed from the provided evidence.",
+      "id": "REQ-1",
+      "requirement": "Include company name in transaction data",
+      "reason": "The Transaction type and backend implementation show assetSymbol but no companyName field. REQ-1 explicitly requires 'company name' to be included in the transaction data returned by the backend.",
       "evidence": [
-        "frontend/src/components/auth/AuthGate.tsx",
-        "frontend/src/components/layout/AppLayout.tsx",
-        "File diff summary note: \"Omitted files due to limits: added=8\""
+        "backend/main.mo"
       ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "User profile creation/storage and a forced profile setup dialog after authentication.",
-      "reason": "BuildRequest did not ask for user profiles; it only required authentication and portfolio holdings/features.",
-      "evidence": [
-        "backend/main.mo (UserProfile types and get/save profile methods)",
-        "frontend/src/components/auth/UserProfileSetupDialog.tsx",
-        "frontend/src/App.tsx (showProfileSetup logic, UserProfileSetupDialog usage)",
-        "frontend/src/hooks/useQueries.ts (useGetCallerUserProfile/useSaveCallerUserProfile)"
-      ]
-    },
-    {
-      "description": "Backend access-control initialization via a secret admin token URL parameter.",
-      "reason": "BuildRequest did not request an admin token, URL secret parameter, or custom access control bootstrap beyond requiring authentication gating.",
-      "evidence": [
-        "frontend/src/hooks/useActor.ts (getSecretParameter('caffeineAdminToken'), _initializeAccessControlWithSecret)",
-        "backend/main.mo (imports authorization/MixinAuthorization and authorization/access-control; permission checks)"
-      ]
-    },
-    {
-      "description": "Light/dark theme toggle UI using next-themes.",
-      "reason": "BuildRequest asked for a cohesive theme (and non blue/purple primary) but did not request a user-controlled theme toggle or next-themes integration.",
-      "evidence": [
-        "frontend/src/App.tsx (ThemeProvider)",
-        "frontend/src/components/layout/AppLayout.tsx (theme toggle button with Sun/Moon, useTheme)"
-      ]
-    },
-    {
-      "description": "Branded footer with external caffeine.ai referral link.",
-      "reason": "Not requested in BuildRequest requirements or acceptance criteria.",
-      "evidence": [
-        "frontend/src/components/layout/AppLayout.tsx (footer with caffeine.ai link)"
-      ]
-    }
-  ],
-  "confidence": 0.74,
+  "hallucinated_features": [],
+  "confidence": 0.85,
   "changed_files": [
-    "all_files_summary.json",
     "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/index.css",
-    "frontend/index.html",
     "frontend/src/App.tsx",
-    "frontend/src/components/auth/AuthGate.tsx",
-    "frontend/src/components/auth/UserProfileSetupDialog.tsx",
-    "frontend/src/components/charts/AllocationDonutChart.tsx",
-    "frontend/src/components/holdings/HoldingRowActions.tsx",
-    "frontend/src/components/holdings/HoldingUpsertDialog.tsx",
-    "frontend/src/components/holdings/HoldingsPanel.tsx",
-    "frontend/src/components/layout/AppLayout.tsx",
-    "frontend/src/components/performance/PerformancePanel.tsx",
-    "frontend/src/components/performance/PerformanceVisualizationPanel.tsx",
-    "frontend/src/components/portfolio/PortfolioSummaryCards.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useLivePrices.ts",
+    "frontend/src/components/transactions/TransactionHistoryPanel.tsx",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/services/prices/priceApi.ts",
-    "frontend/src/utils/performanceMath.ts",
-    "frontend/src/utils/portfolioMath.ts",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

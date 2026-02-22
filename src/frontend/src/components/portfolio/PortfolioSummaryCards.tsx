@@ -8,7 +8,11 @@ import { TrendingUp, TrendingDown, Wallet, AlertCircle, RefreshCw } from 'lucide
 
 export default function PortfolioSummaryCards() {
   const { data: holdings = [], isLoading: holdingsLoading } = useGetHoldings();
-  const assets = holdings.map(h => h.asset.toUpperCase());
+  
+  // Filter to only active holdings (currentQuantity > 0)
+  const activeHoldings = holdings.filter(h => h.currentQuantity > 0);
+  
+  const assets = activeHoldings.map(h => h.asset.toUpperCase());
   const { prices, isLoading: pricesLoading, isError: pricesError, hasData } = useLivePrices(assets);
 
   if (holdingsLoading) {
@@ -62,7 +66,7 @@ export default function PortfolioSummaryCards() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {holdings.length} {holdings.length === 1 ? 'holding' : 'holdings'}
+              {activeHoldings.length} active {activeHoldings.length === 1 ? 'holding' : 'holdings'}
             </p>
           </CardContent>
         </Card>
@@ -115,7 +119,7 @@ export default function PortfolioSummaryCards() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {performance.holdingsWithCostBasis} of {holdings.length} with cost basis
+              {performance.holdingsWithCostBasis} of {activeHoldings.length} with cost basis
             </p>
           </CardContent>
         </Card>

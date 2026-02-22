@@ -1,18 +1,21 @@
 import { useGetHoldings } from '../../hooks/useQueries';
 import { useLivePrices } from '../../hooks/useLivePrices';
 import { calculateHoldingPerformance } from '../../utils/performanceMath';
-import { formatCurrency, formatPercentage, formatNumber } from '../../utils/portfolioMath';
+import { formatCurrency, formatPercentage } from '../../utils/portfolioMath';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 
 export default function PerformancePanel() {
-  const { data: holdings = [], isLoading } = useGetHoldings();
-  const assets = holdings.map(h => h.asset.toUpperCase());
+  const { data: holdings = [], isLoading: holdingsLoading } = useGetHoldings();
+  
+  // Filter to only active holdings (currentQuantity > 0)
+  const activeHoldings = holdings.filter(h => h.currentQuantity > 0);
+  
+  const assets = activeHoldings.map(h => h.asset.toUpperCase());
   const { prices, isLoading: pricesLoading } = useLivePrices(assets);
 
-  if (isLoading) {
+  if (holdingsLoading) {
     return (
       <Card>
         <CardHeader>
@@ -20,7 +23,7 @@ export default function PerformancePanel() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[1, 2].map(i => (
+            {[1, 2, 3].map(i => (
               <div key={i} className="h-12 bg-muted animate-pulse rounded" />
             ))}
           </div>
@@ -29,24 +32,21 @@ export default function PerformancePanel() {
     );
   }
 
-  const holdingsWithPerformance = holdings
-    .map(holding => {
-      const price = prices[holding.asset.toUpperCase()] || 0;
-      return calculateHoldingPerformance(holding, price);
-    })
-    .filter(h => h.costBasis !== null);
+  const holdingsWithCostBasis = activeHoldings.filter(
+    h => h.costBasis !== undefined && h.costBasis !== null
+  );
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Performance Details</CardTitle>
-        <CardDescription>Gain/loss breakdown by asset</CardDescription>
+        <CardDescription>Per-asset breakdown of your portfolio</CardDescription>
       </CardHeader>
       <CardContent>
-        {holdingsWithPerformance.length === 0 ? (
-          <div className="text-center py-8">
+        {holdingsWithCostBasis.length === 0 ? (
+          <div className="text-center py-12">
             <p className="text-muted-foreground">
-              Add cost basis to your holdings to track performance
+              Add cost basis to your holdings to see performance metrics
             </p>
           </div>
         ) : (
@@ -55,7 +55,6 @@ export default function PerformancePanel() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Asset</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
                   <TableHead className="text-right">Cost Basis</TableHead>
                   <TableHead className="text-right">Current Value</TableHead>
                   <TableHead className="text-right">Gain/Loss</TableHead>
@@ -63,37 +62,56 @@ export default function PerformancePanel() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {holdingsWithPerformance.map((perf) => {
-                  const isPositive = (perf.gainLoss || 0) >= 0;
-                  
+                {holdingsWithCostBasis.map((holding) => {
+                  const price = prices[holding.asset.toUpperCase()] || 0;
+                  const performance = calculateHoldingPerformance(holding, price);
+                  const isPositive = performance.gainLoss !== null && performance.gainLoss >= 0;
+
                   return (
-                    <TableRow key={perf.asset}>
+                    <TableRow key={holding.asset}>
                       <TableCell className="font-medium">
-                        {perf.asset.toUpperCase()}
+                        {holding.asset.toUpperCase()}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatNumber(perf.quantity, 8)}
+                        {formatCurrency(holding.costBasis!)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {formatCurrency(perf.costBasis!)}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {pricesLoading ? '...' : formatCurrency(perf.currentValue)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className={`flex items-center justify-end gap-1 ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
-                          {isPositive ? (
-                            <TrendingUp className="h-3 w-3" />
-                          ) : (
-                            <TrendingDown className="h-3 w-3" />
-                          )}
-                          {pricesLoading ? '...' : formatCurrency(perf.gainLoss!)}
-                        </div>
+                        {pricesLoading ? (
+                          <RefreshCw className="h-3 w-3 animate-spin inline" />
+                        ) : price > 0 ? (
+                          formatCurrency(performance.currentValue)
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Badge variant={isPositive ? 'default' : 'destructive'} className="font-mono">
-                          {pricesLoading ? '...' : formatPercentage(perf.gainLossPercent!)}
-                        </Badge>
+                        {pricesLoading ? (
+                          <RefreshCw className="h-3 w-3 animate-spin inline" />
+                        ) : performance.gainLoss !== null ? (
+                          <div className={`flex items-center justify-end gap-1 ${isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                            {isPositive ? (
+                              <TrendingUp className="h-3 w-3" />
+                            ) : (
+                              <TrendingDown className="h-3 w-3" />
+                            )}
+                            <span className="font-medium">
+                              {formatCurrency(performance.gainLoss)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {pricesLoading ? (
+                          <RefreshCw className="h-3 w-3 animate-spin inline" />
+                        ) : performance.gainLossPercent !== null ? (
+                          <span className={isPositive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}>
+                            {formatPercentage(performance.gainLossPercent)}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

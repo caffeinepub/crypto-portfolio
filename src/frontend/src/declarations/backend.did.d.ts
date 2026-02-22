@@ -12,12 +12,28 @@ import type { Principal } from '@icp-sdk/core/principal';
 
 export interface Holding {
   'asset' : string,
-  'user' : Principal,
-  'timestamp' : Time,
+  'purchaseDate' : Time,
+  'saleHistory' : Array<SaleRecord>,
+  'currentQuantity' : number,
   'quantity' : number,
   'costBasis' : [] | [number],
 }
+export interface SaleRecord {
+  'quantitySold' : number,
+  'salePrice' : number,
+  'saleDate' : Time,
+}
 export type Time = bigint;
+export interface Transaction {
+  'shares' : number,
+  'transactionType' : TransactionType,
+  'pricePerShare' : [] | [number],
+  'totalValue' : number,
+  'date' : Time,
+  'assetSymbol' : string,
+}
+export type TransactionType = { 'buy' : number } |
+  { 'sell' : number };
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -26,15 +42,25 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addHolding' : ActorMethod<[string, number, [] | [number]], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'calculateProfitLoss' : ActorMethod<
+    [],
+    { 'totalProfitLoss' : number, 'totalSold' : bigint }
+  >,
   'deleteHolding' : ActorMethod<[string], undefined>,
   'findHoldingsByAsset' : ActorMethod<[string], Array<Holding>>,
   'getAllHoldings' : ActorMethod<[], Array<Holding>>,
+  'getAllTransactions' : ActorMethod<[], Array<Transaction>>,
+  'getArchivedHoldings' : ActorMethod<[], Array<Holding>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getFullArchive' : ActorMethod<[], Array<Holding>>,
   'getHolding' : ActorMethod<[string], [] | [Holding]>,
   'getHoldings' : ActorMethod<[], Array<Holding>>,
+  'getTransactionHistory' : ActorMethod<[string], Array<Holding>>,
+  'getUnsoldHoldings' : ActorMethod<[], Array<Holding>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'recordSale' : ActorMethod<[string, number, number], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updateHolding' : ActorMethod<[string, number, [] | [number]], undefined>,
 }

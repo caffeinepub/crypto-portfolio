@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Holding, UserProfile, UserRole } from '../backend';
+import type { Holding, UserProfile, UserRole, Transaction } from '../backend';
 import { toast } from 'sonner';
 
 export function useGetCallerUserProfile() {
@@ -69,6 +69,38 @@ export function useGetHoldings() {
   });
 }
 
+export function useGetArchivedHoldings() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Holding[]>({
+    queryKey: ['archivedHoldings'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getArchivedHoldings();
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
+export function useGetAllTransactions() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<Transaction[]>({
+    queryKey: ['transactions'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      const transactions = await actor.getAllTransactions();
+      // Sort by date descending (newest first)
+      return transactions.sort((a, b) => {
+        const dateA = Number(a.date);
+        const dateB = Number(b.date);
+        return dateB - dateA;
+      });
+    },
+    enabled: !!actor && !actorFetching,
+  });
+}
+
 export function useAddHolding() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -80,6 +112,7 @@ export function useAddHolding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holdings'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast.success('Holding added successfully');
     },
     onError: (error: Error) => {
@@ -118,10 +151,32 @@ export function useDeleteHolding() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['holdings'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
       toast.success('Holding deleted successfully');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to delete holding');
+    },
+  });
+}
+
+export function useRecordSaleMutation() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ asset, quantitySold, salePrice }: { asset: string; quantitySold: number; salePrice: number }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.recordSale(asset, quantitySold, salePrice);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['holdings'] });
+      queryClient.invalidateQueries({ queryKey: ['archivedHoldings'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      toast.success('Sale recorded successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to record sale');
     },
   });
 }

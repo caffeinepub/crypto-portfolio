@@ -14,12 +14,30 @@ export const UserRole = IDL.Variant({
   'guest' : IDL.Null,
 });
 export const Time = IDL.Int;
+export const SaleRecord = IDL.Record({
+  'quantitySold' : IDL.Float64,
+  'salePrice' : IDL.Float64,
+  'saleDate' : Time,
+});
 export const Holding = IDL.Record({
   'asset' : IDL.Text,
-  'user' : IDL.Principal,
-  'timestamp' : Time,
+  'purchaseDate' : Time,
+  'saleHistory' : IDL.Vec(SaleRecord),
+  'currentQuantity' : IDL.Float64,
   'quantity' : IDL.Float64,
   'costBasis' : IDL.Opt(IDL.Float64),
+});
+export const TransactionType = IDL.Variant({
+  'buy' : IDL.Float64,
+  'sell' : IDL.Float64,
+});
+export const Transaction = IDL.Record({
+  'shares' : IDL.Float64,
+  'transactionType' : TransactionType,
+  'pricePerShare' : IDL.Opt(IDL.Float64),
+  'totalValue' : IDL.Float64,
+  'date' : Time,
+  'assetSymbol' : IDL.Text,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
@@ -31,19 +49,30 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'calculateProfitLoss' : IDL.Func(
+      [],
+      [IDL.Record({ 'totalProfitLoss' : IDL.Float64, 'totalSold' : IDL.Nat })],
+      ['query'],
+    ),
   'deleteHolding' : IDL.Func([IDL.Text], [], []),
   'findHoldingsByAsset' : IDL.Func([IDL.Text], [IDL.Vec(Holding)], ['query']),
   'getAllHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
+  'getAllTransactions' : IDL.Func([], [IDL.Vec(Transaction)], ['query']),
+  'getArchivedHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getFullArchive' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
   'getHolding' : IDL.Func([IDL.Text], [IDL.Opt(Holding)], ['query']),
   'getHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
+  'getTransactionHistory' : IDL.Func([IDL.Text], [IDL.Vec(Holding)], ['query']),
+  'getUnsoldHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'recordSale' : IDL.Func([IDL.Text, IDL.Float64, IDL.Float64], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updateHolding' : IDL.Func(
       [IDL.Text, IDL.Float64, IDL.Opt(IDL.Float64)],
@@ -61,12 +90,30 @@ export const idlFactory = ({ IDL }) => {
     'guest' : IDL.Null,
   });
   const Time = IDL.Int;
+  const SaleRecord = IDL.Record({
+    'quantitySold' : IDL.Float64,
+    'salePrice' : IDL.Float64,
+    'saleDate' : Time,
+  });
   const Holding = IDL.Record({
     'asset' : IDL.Text,
-    'user' : IDL.Principal,
-    'timestamp' : Time,
+    'purchaseDate' : Time,
+    'saleHistory' : IDL.Vec(SaleRecord),
+    'currentQuantity' : IDL.Float64,
     'quantity' : IDL.Float64,
     'costBasis' : IDL.Opt(IDL.Float64),
+  });
+  const TransactionType = IDL.Variant({
+    'buy' : IDL.Float64,
+    'sell' : IDL.Float64,
+  });
+  const Transaction = IDL.Record({
+    'shares' : IDL.Float64,
+    'transactionType' : TransactionType,
+    'pricePerShare' : IDL.Opt(IDL.Float64),
+    'totalValue' : IDL.Float64,
+    'date' : Time,
+    'assetSymbol' : IDL.Text,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
@@ -78,19 +125,39 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'calculateProfitLoss' : IDL.Func(
+        [],
+        [
+          IDL.Record({
+            'totalProfitLoss' : IDL.Float64,
+            'totalSold' : IDL.Nat,
+          }),
+        ],
+        ['query'],
+      ),
     'deleteHolding' : IDL.Func([IDL.Text], [], []),
     'findHoldingsByAsset' : IDL.Func([IDL.Text], [IDL.Vec(Holding)], ['query']),
     'getAllHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
+    'getAllTransactions' : IDL.Func([], [IDL.Vec(Transaction)], ['query']),
+    'getArchivedHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getFullArchive' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
     'getHolding' : IDL.Func([IDL.Text], [IDL.Opt(Holding)], ['query']),
     'getHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
+    'getTransactionHistory' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Holding)],
+        ['query'],
+      ),
+    'getUnsoldHoldings' : IDL.Func([], [IDL.Vec(Holding)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'recordSale' : IDL.Func([IDL.Text, IDL.Float64, IDL.Float64], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updateHolding' : IDL.Func(
         [IDL.Text, IDL.Float64, IDL.Opt(IDL.Float64)],

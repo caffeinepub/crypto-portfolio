@@ -7,6 +7,7 @@ import PortfolioSummaryCards from './components/portfolio/PortfolioSummaryCards'
 import HoldingsPanel from './components/holdings/HoldingsPanel';
 import PerformancePanel from './components/performance/PerformancePanel';
 import PerformanceVisualizationPanel from './components/performance/PerformanceVisualizationPanel';
+import TransactionHistoryPanel from './components/transactions/TransactionHistoryPanel';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
 
@@ -60,6 +61,7 @@ export default function App() {
               <PerformanceVisualizationPanel />
             </div>
           </div>
+          <TransactionHistoryPanel />
         </div>
       </AppLayout>
       <Toaster />
